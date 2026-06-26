@@ -176,10 +176,35 @@ let ch=false;
 for(const k in prog){ if(!k.startsWith(todayKey+"|")){ delete prog[k]; ch=true; } }
 if(ch) save("wk_prog",prog);
 let voiceOn=load("wk_voice",true);
-function spoken(d){ return (d||"").replace(/×/g," by ").replace(/[·•]/g,", ").replace(/–/g," to ")
-  .replace(/\blb\b/g,"pounds").replace(/\bmin\b/g,"minutes").replace(/(\d)\s*s\b/g,"$1 seconds"); }
+// pick a soft, natural-sounding voice (falls back gracefully)
+let chosenVoice=null;
+function pickVoice(){
+  if(!("speechSynthesis"in window))return;
+  const vs=speechSynthesis.getVoices(); if(!vs.length)return;
+  const prefer=["Samantha","Karen","Moira","Tessa","Ava","Allison","Susan","Google US English",
+    "Microsoft Aria","Microsoft Jenny","Microsoft Michelle","Microsoft Zira","Fiona","Serena"];
+  for(const name of prefer){ const v=vs.find(x=>x.name.includes(name)); if(v){ chosenVoice=v; return; } }
+  chosenVoice=vs.find(x=>/en[-_]US/i.test(x.lang)) || vs.find(x=>/^en/i.test(x.lang)) || vs[0];
+}
+if("speechSynthesis"in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+// turn the terse plan text into natural spoken phrasing
+function spoken(d){ if(!d) return "";
+  return d
+    .replace(/(\d+)\s*×\s*(\d+(?:\s*[–-]\s*\d+)?)/g,"$1 sets of $2")  // 3 × 10 -> 3 sets of 10
+    .replace(/×/g," by ")
+    .replace(/\s*\/\s*/g," per ")                                     // /arm /side /leg -> per ...
+    .replace(/[·•]/g,". ")
+    .replace(/(\d)\s*[–-]\s*(\d)/g,"$1 to $2")                        // 25–45 -> 25 to 45
+    .replace(/\blb\b/g,"pounds")
+    .replace(/\bmin\b/g,"minutes")
+    .replace(/(\d)\s*s\b/g,"$1 seconds")
+    .replace(/\bdir\b/g,"directions")
+    .replace(/\s+/g," ").trim();
+}
 function say(t){ if(!voiceOn||!("speechSynthesis"in window)||!t)return;
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.rate=1; u.pitch=1; speechSynthesis.speak(u);}catch(e){} }
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t);
+    if(chosenVoice) u.voice=chosenVoice; u.rate=0.9; u.pitch=1.05; u.volume=1;
+    speechSynthesis.speak(u);}catch(e){} }
 function nextUnchecked(day){ const items=PLAN[day].items;
   for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]) return items[i]; } return null; }
 
@@ -245,7 +270,7 @@ function render(day){
       if(justDone) prog[pkey]=true; else delete prog[pkey];
       save("wk_prog",prog); recordToday(); updateProg();
       if(justDone && day===current){ const nx=nextUnchecked(day);
-        if(nx) say("Next: "+nx.n+". "+spoken(nx.d)); else say("Workout complete. Great work."); }
+        if(nx) say("Nice work. Next up, "+nx.n+". "+spoken(nx.d)); else say("That's everything. Great job today."); }
     };
     listEl.appendChild(li);
   });
@@ -323,7 +348,7 @@ startBtn.onclick=()=>{
     if(history[todayKey]){ history[todayKey].dur=sec; } },1000);
   window.scrollTo({top:170,behavior:"smooth"});
   const nx=nextUnchecked(current)||PLAN[current].items[0];
-  say("Let's begin. "+PLAN[current].focus+". First up: "+nx.n+". "+spoken(nx.d));
+  say("Let's begin, nice and easy. Today is "+PLAN[current].focus+". First up, "+nx.n+". "+spoken(nx.d));
 };
 window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } });
 
@@ -331,10 +356,10 @@ window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[toda
 let rHandle=null,rLeft=0; const restclock=document.getElementById("restclock");
 document.querySelectorAll("#rest button").forEach(b=>{
   b.onclick=()=>{ clearInterval(rHandle); rLeft=parseInt(b.dataset.s,10); restclock.textContent=rLeft;
-    say("Rest "+rLeft+" seconds.");
+    say("Take a rest for "+rLeft+" seconds.");
     rHandle=setInterval(()=>{ rLeft--; restclock.textContent=rLeft>0?rLeft:"GO!";
       if(rLeft>0&&rLeft<=3) say(String(rLeft));
-      if(rLeft<=0){ clearInterval(rHandle); say("Go!"); setTimeout(()=>restclock.textContent="—",1500); } },1000); };
+      if(rLeft<=0){ clearInterval(rHandle); say("Okay, back to it."); setTimeout(()=>restclock.textContent="—",1500); } },1000); };
 });
 
 render(todayName);
