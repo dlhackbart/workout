@@ -37,6 +37,13 @@
   .wt { margin-top:6px; display:flex; align-items:center; gap:6px; font-size:.8rem; color:var(--mut); }
   .wt input { width:62px; background:#0d1117; border:1px solid #2c3850; color:var(--txt); border-radius:8px;
               padding:6px 8px; font-size:.95rem; }
+  li.active { border-color:var(--acc2); box-shadow:0 0 0 1px var(--acc2) inset; }
+  .logrow { margin-top:8px; display:flex; align-items:center; gap:7px; font-size:.8rem; color:var(--mut); flex-wrap:wrap; }
+  .logrow .num { width:56px; background:#0d1117; border:1px solid #2c3850; color:var(--txt); border-radius:8px;
+                 padding:7px 8px; font-size:1rem; }
+  .vhead { font-size:.72rem; color:var(--mut); margin:12px 0 4px; text-transform:uppercase; letter-spacing:.4px; }
+  .vrow { display:flex; justify-content:space-between; gap:10px; font-size:.82rem; padding:5px 0; border-top:1px solid #222b3a; }
+  .vrow span:last-child { color:var(--txt); text-align:right; white-space:nowrap; }
   .clip { width:64px; height:64px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
           border:1px solid #2c3850; display:flex; align-items:center; justify-content:center; position:relative; }
   .clip img { width:100%; height:100%; object-fit:cover; }
@@ -207,6 +214,27 @@ function say(t){ if(!voiceOn||!("speechSynthesis"in window)||!t)return;
     speechSynthesis.speak(u);}catch(e){} }
 function nextUnchecked(day){ const items=PLAN[day].items;
   for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]) return items[i]; } return null; }
+// ---- planned vs actual logging ----
+let logs=load("wk_logs",{});            // logs[date]={day, items:{idx:{name,plannedSets,plannedWt,plannedWtText,actualSets,actualWt}}}
+function planInfo(d){ let sets=null,lo=null,hi=null,wtText="";
+  const m=(d||"").match(/(\d+)\s*×/); if(m) sets=+m[1];
+  const w=(d||"").match(/(\d+)\s*[–-]\s*(\d+)\s*lb/);
+  if(w){ lo=+w[1]; hi=+w[2]; wtText=w[1]+"–"+w[2]+" lb"; }
+  else { const s=(d||"").match(/(\d+)\s*lb/); if(s){ lo=hi=+s[1]; wtText=s[1]+" lb"; } }
+  return {sets, wtText, wtMid: lo!=null?Math.round((lo+hi)/2):null}; }
+function saveActual(day,i,it,sets,wt){ if(day!==todayName)return;
+  if(!logs[todayKey]) logs[todayKey]={day:todayName,items:{}};
+  const pi=planInfo(it.d);
+  logs[todayKey].items[i]={name:it.n, plannedSets:pi.sets, plannedWt:pi.wtMid, plannedWtText:pi.wtText,
+    actualSets:(sets===""||sets==null)?null:+sets, actualWt:(wt===""||wt==null)?null:+wt};
+  save("wk_logs",logs); }
+function askLine(it){ const pi=planInfo(it.d);
+  if(pi.sets!=null && pi.wtMid!=null) return "How many sets, and what weight? You're planned for "+pi.sets+" sets at about "+pi.wtMid+" pounds. Adjust below if you'd like.";
+  if(pi.sets!=null) return "You're planned for "+pi.sets+" sets. Adjust below if you'd like.";
+  return ""; }
+function setActive(day){ let idx=-1; const items=PLAN[day].items;
+  for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]){ idx=i; break; } }
+  [...listEl.children].forEach((li,i)=>li.classList.toggle("active", i===idx)); }
 
 const tabsEl=document.getElementById("tabs"),listEl=document.getElementById("list");
 const focusEl=document.getElementById("focus"),daynameEl=document.getElementById("dayname");
@@ -255,12 +283,22 @@ function render(day){
     const box=document.createElement("div"); box.className="box"; box.textContent="✓";
     const mid=document.createElement("div"); mid.className="mid";
     mid.innerHTML=`<div class="nm">${it.n}</div>${it.d?`<div class="dt">${it.d}</div>`:""}`;
-    if(it.d && it.d.includes("lb")){
-      const wt=document.createElement("div"); wt.className="wt"; wt.onclick=e=>e.stopPropagation();
-      const inp=document.createElement("input"); inp.type="number"; inp.placeholder="lb"; inp.inputMode="numeric";
-      inp.value=weights[it.c]||"";
-      inp.oninput=()=>{ weights[it.c]=inp.value; save("wk_weights",weights); };
-      wt.append("Working wt:",inp,"lb"); mid.appendChild(wt);
+    const pi=planInfo(it.d);
+    if(pi.sets!=null || (it.d && it.d.includes("lb"))){
+      const cur=(logs[todayKey]&&logs[todayKey].items[i])||{};
+      const row=document.createElement("div"); row.className="logrow"; row.onclick=e=>e.stopPropagation();
+      const sIn=document.createElement("input"); sIn.type="number"; sIn.min=0; sIn.inputMode="numeric"; sIn.className="num";
+      sIn.value=cur.actualSets!=null?cur.actualSets:(pi.sets!=null?pi.sets:"");
+      let wIn=null;
+      if(it.d.includes("lb")){
+        wIn=document.createElement("input"); wIn.type="number"; wIn.min=0; wIn.inputMode="numeric"; wIn.className="num";
+        wIn.value=cur.actualWt!=null?cur.actualWt:(weights[it.c]!=null?weights[it.c]:(pi.wtMid!=null?pi.wtMid:""));
+      }
+      const sync=()=>{ if(wIn&&it.c&&wIn.value!==""){ weights[it.c]=wIn.value; save("wk_weights",weights);} saveActual(day,i,it,sIn.value,wIn?wIn.value:""); };
+      sIn.oninput=sync; if(wIn) wIn.oninput=sync;
+      row.append("Sets",sIn); if(wIn) row.append("Weight",wIn,"lb");
+      mid.appendChild(row);
+      if(!(logs[todayKey]&&logs[todayKey].items[i])) saveActual(day,i,it,sIn.value,wIn?wIn.value:"");
     }
     li.appendChild(box); li.appendChild(mid);
     if(it.c) li.appendChild(clipEl(it.c,it.n));
@@ -268,12 +306,13 @@ function render(day){
       li.classList.toggle("done");
       const justDone=li.classList.contains("done");
       if(justDone) prog[pkey]=true; else delete prog[pkey];
-      save("wk_prog",prog); recordToday(); updateProg();
+      save("wk_prog",prog); recordToday(); updateProg(); setActive(day);
       if(justDone && day===current){ const nx=nextUnchecked(day);
-        if(nx) say("Nice work. Next up, "+nx.n+". "+spoken(nx.d)); else say("That's everything. Great job today."); }
+        if(nx) say("Nice work. Next up, "+nx.n+". "+spoken(nx.d)+" "+askLine(nx)); else say("That's everything. Great job today."); }
     };
     listEl.appendChild(li);
   });
+  setActive(day);
   updateProg();
 }
 function updateProg(){
@@ -321,6 +360,24 @@ function renderStats(){
     </div>
     <div style="font-size:.72rem;color:var(--mut);margin-bottom:2px">Last 14 days (green = ≥80% complete)</div>
     <div class="hist">${bars}</div><div class="hist-lab">${labs}</div>`;
+  // planned vs actual: all-time adherence + today's detail
+  let lift=0,onp=0;
+  for(const dk in logs){ for(const k in logs[dk].items){ const it=logs[dk].items[k];
+    if(it.plannedSets==null && it.plannedWt==null) continue; lift++;
+    const okS=it.actualSets==null||it.plannedSets==null||it.actualSets>=it.plannedSets;
+    const okW=it.actualWt==null||it.plannedWt==null||it.actualWt>=it.plannedWt;
+    if(okS&&okW) onp++; } }
+  const L=logs[todayKey]; let v="";
+  if(L){ for(const k in L.items){ const it=L.items[k];
+    if(it.plannedSets==null && it.plannedWt==null) continue;
+    let right=`${it.actualSets??"–"}/${it.plannedSets??"–"} sets`;
+    if(it.plannedWt!=null||it.actualWt!=null){
+      const dv=(it.actualWt!=null&&it.plannedWt!=null)?it.actualWt-it.plannedWt:null;
+      const ar=dv==null?"":(dv>0?` 🔼+${dv}`:(dv<0?` 🔽${dv}`:" ✓"));
+      right+=` · ${it.actualWt??"–"}/${it.plannedWt??"–"} lb${ar}`; }
+    v+=`<div class="vrow"><span>${it.name}</span><span>${right}</span></div>`; } }
+  if(lift) statsEl.innerHTML+=`<div class="vhead">On-plan all-time: ${Math.round(onp/lift*100)}% of ${lift} lifts (actual ≥ planned)</div>`;
+  if(v) statsEl.innerHTML+=`<div class="vhead">Today — actual / planned</div>${v}`;
 }
 document.getElementById("statsBtn").onclick=()=>{
   const show=statsEl.style.display!=="block";
@@ -348,7 +405,7 @@ startBtn.onclick=()=>{
     if(history[todayKey]){ history[todayKey].dur=sec; } },1000);
   window.scrollTo({top:170,behavior:"smooth"});
   const nx=nextUnchecked(current)||PLAN[current].items[0];
-  say("Let's begin, nice and easy. Today is "+PLAN[current].focus+". First up, "+nx.n+". "+spoken(nx.d));
+  say("Let's begin, nice and easy. Today is "+PLAN[current].focus+". First up, "+nx.n+". "+spoken(nx.d)+" "+askLine(nx));
 };
 window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } });
 
