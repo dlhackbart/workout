@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workout — Strength & Mobility</title>
+<style>
+  :root { --bg:#11151c; --card:#1b2230; --acc:#4caf6d; --acc2:#3a7bd5; --txt:#e8edf4; --mut:#8a97a8; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,system-ui,sans-serif; background:var(--bg); color:var(--txt); }
+  header { padding:18px 16px 8px; }
+  h1 { font-size:1.05rem; margin:0; color:var(--mut); font-weight:600; letter-spacing:.3px; }
+  #focus { font-size:1.7rem; font-weight:700; margin:2px 0 0; }
+  #tabs { display:flex; gap:6px; overflow-x:auto; padding:8px 16px 12px; }
+  .tab { flex:0 0 auto; padding:8px 12px; border-radius:20px; background:var(--card); color:var(--mut);
+         border:1px solid transparent; font-size:.85rem; cursor:pointer; }
+  .tab.active { color:#fff; border-color:var(--acc); background:#22304a; }
+  .tab.today::after { content:" •"; color:var(--acc); }
+  #bar { display:flex; align-items:center; gap:10px; padding:0 16px 10px; flex-wrap:wrap; }
+  button.go { background:var(--acc); color:#06210f; border:0; padding:12px 18px; border-radius:12px;
+              font-size:1rem; font-weight:700; cursor:pointer; }
+  button.go.stop { background:#c0563f; color:#fff; }
+  #elapsed { font-variant-numeric:tabular-nums; font-size:1.1rem; color:var(--mut); }
+  #prog { margin-left:auto; font-size:.9rem; color:var(--mut); }
+  .mini { font-size:.8rem; color:var(--acc2); background:none; border:0; cursor:pointer; }
+  ul { list-style:none; margin:0; padding:0 12px 96px; }
+  li { background:var(--card); margin:8px 4px; border-radius:14px; padding:12px; display:flex;
+       align-items:center; gap:12px; cursor:pointer; transition:opacity .15s, background .15s; border:1px solid #222b3a; }
+  li.done { opacity:.5; background:#16201a; }
+  .box { width:26px; height:26px; flex:0 0 auto; border:2px solid var(--mut); border-radius:8px; display:flex;
+         align-items:center; justify-content:center; font-size:1rem; color:var(--acc); }
+  li.done .box { border-color:var(--acc); background:var(--acc); color:#06210f; }
+  .mid { flex:1 1 auto; min-width:0; }
+  .nm { font-size:1.05rem; font-weight:600; }
+  .dt { font-size:.85rem; color:var(--mut); margin-top:2px; }
+  li.done .nm { text-decoration:line-through; }
+  .wt { margin-top:6px; display:flex; align-items:center; gap:6px; font-size:.8rem; color:var(--mut); }
+  .wt input { width:62px; background:#0d1117; border:1px solid #2c3850; color:var(--txt); border-radius:8px;
+              padding:6px 8px; font-size:.95rem; }
+  .clip { width:64px; height:64px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
+          border:1px solid #2c3850; display:flex; align-items:center; justify-content:center; position:relative; }
+  .clip img { width:100%; height:100%; object-fit:cover; }
+  .clip .ph { font-size:.62rem; color:#5e6b7d; text-align:center; line-height:1.2; }
+  #rest { position:fixed; left:0; right:0; bottom:0; background:#0d1117; border-top:1px solid #222b3a;
+          display:flex; align-items:center; justify-content:center; gap:14px; padding:12px; z-index:5; }
+  #rest button { background:var(--acc2); color:#fff; border:0; border-radius:10px; padding:10px 14px; font-size:.95rem; cursor:pointer; }
+  #restclock { font-size:1.4rem; font-variant-numeric:tabular-nums; min-width:62px; text-align:center; }
+  #done-msg { text-align:center; padding:18px; font-size:1.2rem; color:var(--acc); display:none; }
+  a.log { color:var(--acc2); font-size:.85rem; text-decoration:none; }
+  /* stats panel */
+  #stats { display:none; margin:0 16px 12px; background:var(--card); border:1px solid #222b3a; border-radius:14px; padding:14px; }
+  .stat-row { display:flex; gap:18px; margin-bottom:12px; }
+  .stat { text-align:center; }
+  .stat .v { font-size:1.6rem; font-weight:800; color:var(--acc); }
+  .stat .l { font-size:.72rem; color:var(--mut); text-transform:uppercase; letter-spacing:.4px; }
+  .hist { display:flex; align-items:flex-end; gap:3px; height:54px; margin-top:6px; }
+  .hist .bar { flex:1; background:#2c3850; border-radius:3px 3px 0 0; position:relative; min-height:3px; }
+  .hist .bar.full { background:var(--acc); }
+  .hist .bar.today { outline:1px solid var(--acc2); }
+  .hist-lab { display:flex; gap:3px; margin-top:4px; }
+  .hist-lab span { flex:1; text-align:center; font-size:.55rem; color:#5e6b7d; }
+  /* lightbox */
+  #lb { display:none; position:fixed; inset:0; background:rgba(0,0,0,.86); z-index:20; align-items:center; justify-content:center; flex-direction:column; gap:14px; padding:20px; }
+  #lb img { max-width:90vw; max-height:64vh; border-radius:14px; }
+  #lb .cap { font-size:1.2rem; font-weight:700; }
+  #lb .sub { color:var(--mut); font-size:.9rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="dayname"></h1>
+  <div id="focus"></div>
+</header>
+<div id="tabs"></div>
+<div id="bar">
+  <button class="go" id="startBtn">▶ Start Workout</button>
+  <span id="elapsed" style="display:none">00:00</span>
+  <span id="prog"></span>
+  <button class="mini" id="statsBtn">📊 Stats</button>
+  <button class="mini" id="reset">↺ reset day</button>
+</div>
+<div id="stats"></div>
+<ul id="list"></ul>
+<div id="done-msg">✅ Workout complete — nice work!<br><a class="log" href="weight_log.md">Open weight log →</a></div>
+<div id="rest">
+  <button data-s="60">Rest 60s</button>
+  <button data-s="90">Rest 90s</button>
+  <span id="restclock">—</span>
+</div>
+<div id="lb"><img id="lbimg" alt=""><div class="cap" id="lbcap"></div><div class="sub">tap anywhere to close</div></div>
+
+<script>
+// Names below are the accepted/standard exercise names; c = clip id (animated start/finish frames in clips/).
+const PLAN = {
+  Monday:    { focus:"Strength Day A", items:[
+    {n:"Goblet Squat", d:"3 × 10  ·  25–45 lb", c:"goblet-squat"},
+    {n:"Romanian Deadlift (RDL)", d:"3 × 10  ·  25–45 lb", c:"rdl"},
+    {n:"One-Arm Dumbbell Row", d:"3 × 10 / arm  ·  20–40 lb", c:"db-row"},
+    {n:"Seated Dumbbell Press", d:"3 × 10  ·  15–25 lb", c:"shoulder-press"},
+    {n:"Kneeling Hip Flexor Stretch", d:"30s × 3 dir/side", c:"hip-flexor-stretch"},
+    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"},
+    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
+    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"} ]},
+  Tuesday:   { focus:"Mobility & Recovery Day", items:[
+    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
+    {n:"Split-Stance Hip Flexor Stretch — Left", d:"30–45s", c:"split-stance-hip"},
+    {n:"Split-Stance Hip Flexor Stretch — Right", d:"30–45s", c:"split-stance-hip"},
+    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
+    {n:"Romanian Deadlift — Dowel (form drill)", d:"2 × 10", c:"rdl-dowel"},
+    {n:"Monster Walk (Banded)", d:"2 × 10 each way", c:"sumo-walk"},
+    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
+    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
+    {n:"Walk", d:"20–30 min", c:"walk"} ]},
+  Wednesday: { focus:"Strength Day B", items:[
+    {n:"Dumbbell Step-Up", d:"3 × 10 / leg  ·  15–30 lb", c:"step-up"},
+    {n:"Split Squat with Dumbbells (Bulgarian)", d:"3 × 8–10 / leg  ·  15–30 lb", c:"bulgarian-split-squat"},
+    {n:"Incline Dumbbell Press", d:"3 × 10  ·  20–35 lb", c:"incline-bench"},
+    {n:"Dumbbell Thruster (Squat to Press)", d:"3 × 10  ·  15–25 lb", c:"squat-press"},
+    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
+    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
+    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"},
+    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"} ]},
+  Thursday:  { focus:"Mobility & Core Rotation Day", items:[
+    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
+    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
+    {n:"Split-Stance Hip Flexor Stretch — Left", d:"30–45s", c:"split-stance-hip"},
+    {n:"Split-Stance Hip Flexor Stretch — Right", d:"30–45s", c:"split-stance-hip"},
+    {n:"Romanian Deadlift — Dowel (form drill)", d:"2 × 10", c:"rdl-dowel"},
+    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
+    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
+    {n:"Overhead Wood Chop (Ax Chop)", d:"2 × 10 / side", c:"ax-chop"},
+    {n:"Walk", d:"20–30 min", c:"walk"} ]},
+  Friday:    { focus:"Strength Day C", items:[
+    {n:"Stiff-Legged Dumbbell Deadlift", d:"3 × 8–10  ·  30–50 lb", c:"db-deadlift"},
+    {n:"Goblet Squat", d:"3 × 10  ·  25–45 lb", c:"goblet-squat"},
+    {n:"One-Arm Dumbbell Row", d:"3 × 10–12 / arm  ·  20–40 lb", c:"db-row"},
+    {n:"Seated Dumbbell Press", d:"3 × 10  ·  15–25 lb", c:"shoulder-press"},
+    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
+    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
+    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"},
+    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"} ]},
+  Saturday:  { focus:"Functional Movement & Mobility", items:[
+    {n:"Monster Walk (Banded)", d:"2 × 10 each way", c:"sumo-walk"},
+    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
+    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
+    {n:"Overhead Wood Chop (Ax Chop)", d:"2 × 10 / side", c:"ax-chop"},
+    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
+    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
+    {n:"Split-Stance Hip Flexor Stretch — L & R", d:"30–45s each", c:"split-stance-hip"},
+    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
+    {n:"Walk", d:"30 min", c:"walk"} ]},
+  Sunday:    { focus:"Recovery & Reset", items:[
+    {n:"Light Walking", d:"20–30 min", c:"walk"},
+    {n:"Deep Breathing", d:"5 min"},
+    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
+    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"},
+    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
+    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
+    {n:"Review Weekly Progress", d:""},
+    {n:"Record Weight", d:""},
+    {n:"Plan Upcoming Week", d:""} ]}
+};
+const ORDER=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const todayName=ORDER[new Date().getDay()];
+const dkey=dt=>`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+const todayKey=dkey(new Date());
+let current=todayName;
+
+function load(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch(e){ return def; } }
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+let weights=load("wk_weights",{});
+let prog=load("wk_prog",{});
+let history=load("wk_history",{});       // {date:{day,done,total,dur}}
+let ch=false;
+for(const k in prog){ if(!k.startsWith(todayKey+"|")){ delete prog[k]; ch=true; } }
+if(ch) save("wk_prog",prog);
+
+const tabsEl=document.getElementById("tabs"),listEl=document.getElementById("list");
+const focusEl=document.getElementById("focus"),daynameEl=document.getElementById("dayname");
+const progEl=document.getElementById("prog"),doneMsg=document.getElementById("done-msg");
+const statsEl=document.getElementById("stats");
+const lb=document.getElementById("lb"),lbimg=document.getElementById("lbimg"),lbcap=document.getElementById("lbcap");
+
+function clipEl(c,name){
+  const wrap=document.createElement("div"); wrap.className="clip";
+  const img=document.createElement("img"); img.alt=name;
+  const f0="clips/"+c+"-0.jpg", f1="clips/"+c+"-1.jpg";
+  let frame=0, two=true, timer=null;
+  const probe=new Image(); probe.onload=()=>{}; probe.onerror=()=>{ two=false; }; probe.src=f1;
+  img.src=f0;
+  img.onerror=()=>{ wrap.innerHTML='<span class="ph">clip<br>soon</span>'; if(timer)clearInterval(timer); };
+  img.onload=()=>{ if(!timer) timer=setInterval(()=>{ if(!two)return; frame^=1; img.src=frame?f1:f0; },900); };
+  wrap.appendChild(img);
+  wrap.onclick=e=>{ e.stopPropagation();
+    if(wrap.querySelector(".ph"))return;
+    lbcap.textContent=name; lbimg.src=img.src; lb.style.display="flex";
+    lb._t&&clearInterval(lb._t); let g=0;
+    lb._t=setInterval(()=>{ g^=1; lbimg.src=(g&&two)?f1:f0; },800);
+  };
+  return wrap;
+}
+lb.onclick=()=>{ lb.style.display="none"; lb._t&&clearInterval(lb._t); };
+
+function recordToday(){
+  if(current!==todayName) return;
+  const items=PLAN[todayName].items;
+  let done=0; items.forEach((_,i)=>{ if(prog[todayKey+"|"+todayName+"|"+i]) done++; });
+  history[todayKey]={day:todayName, done, total:items.length, dur:(history[todayKey]&&history[todayKey].dur)||0};
+  save("wk_history",history);
+}
+
+function render(day){
+  current=day;
+  daynameEl.textContent=(day===todayName?"TODAY · ":"")+day;
+  focusEl.textContent=PLAN[day].focus;
+  [...tabsEl.children].forEach(t=>t.classList.toggle("active",t.dataset.day===day));
+  listEl.innerHTML="";
+  PLAN[day].items.forEach((it,i)=>{
+    const li=document.createElement("li");
+    const pkey=todayKey+"|"+day+"|"+i;
+    if(prog[pkey]) li.classList.add("done");
+    const box=document.createElement("div"); box.className="box"; box.textContent="✓";
+    const mid=document.createElement("div"); mid.className="mid";
+    mid.innerHTML=`<div class="nm">${it.n}</div>${it.d?`<div class="dt">${it.d}</div>`:""}`;
+    if(it.d && it.d.includes("lb")){
+      const wt=document.createElement("div"); wt.className="wt"; wt.onclick=e=>e.stopPropagation();
+      const inp=document.createElement("input"); inp.type="number"; inp.placeholder="lb"; inp.inputMode="numeric";
+      inp.value=weights[it.c]||"";
+      inp.oninput=()=>{ weights[it.c]=inp.value; save("wk_weights",weights); };
+      wt.append("Working wt:",inp,"lb"); mid.appendChild(wt);
+    }
+    li.appendChild(box); li.appendChild(mid);
+    if(it.c) li.appendChild(clipEl(it.c,it.n));
+    li.onclick=()=>{
+      li.classList.toggle("done");
+      if(li.classList.contains("done")) prog[pkey]=true; else delete prog[pkey];
+      save("wk_prog",prog); recordToday(); updateProg();
+    };
+    listEl.appendChild(li);
+  });
+  updateProg();
+}
+function updateProg(){
+  const items=[...listEl.children];
+  const done=items.filter(li=>li.classList.contains("done")).length;
+  progEl.textContent=`${done}/${items.length} done`;
+  doneMsg.style.display=(done===items.length && items.length)?"block":"none";
+}
+
+ORDER.forEach(day=>{
+  const t=document.createElement("div");
+  t.className="tab"+(day===todayName?" today":"");
+  t.dataset.day=day; t.textContent=day.slice(0,3);
+  t.onclick=()=>render(day);
+  tabsEl.appendChild(t);
+});
+document.getElementById("reset").onclick=()=>{
+  PLAN[current].items.forEach((_,i)=>delete prog[todayKey+"|"+current+"|"+i]);
+  save("wk_prog",prog); recordToday(); render(current);
+};
+
+// ---- stats / scoring ----
+function pctOf(h){ return h&&h.total ? h.done/h.total : 0; }
+function renderStats(){
+  let streak=0, cur=new Date();
+  if(pctOf(history[dkey(cur)])<0.8) cur.setDate(cur.getDate()-1);
+  while(pctOf(history[dkey(cur)])>=0.8){ streak++; cur.setDate(cur.getDate()-1); }
+  let sessions=0, totalDone=0;
+  for(const k in history){ if(pctOf(history[k])>=0.8) sessions++; totalDone+=history[k].done||0; }
+  let sum=0; for(let i=0;i<7;i++){ const d=new Date(); d.setDate(d.getDate()-i); sum+=pctOf(history[dkey(d)]); }
+  const week=Math.round(sum/7*100);
+  let bars="", labs="";
+  for(let i=13;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i); const k=dkey(d); const p=pctOf(history[k]);
+    const cls="bar"+(p>=0.8?" full":"")+(k===todayKey?" today":"");
+    bars+=`<div class="${cls}" style="height:${Math.max(3,Math.round(p*54))}px" title="${k}: ${Math.round(p*100)}%"></div>`;
+    labs+=`<span>${["S","M","T","W","T","F","S"][d.getDay()]}</span>`;
+  }
+  statsEl.innerHTML=`
+    <div class="stat-row">
+      <div class="stat"><div class="v">${streak}</div><div class="l">Day streak</div></div>
+      <div class="stat"><div class="v">${week}%</div><div class="l">This week</div></div>
+      <div class="stat"><div class="v">${sessions}</div><div class="l">Workouts</div></div>
+      <div class="stat"><div class="v">${totalDone}</div><div class="l">Exercises done</div></div>
+    </div>
+    <div style="font-size:.72rem;color:var(--mut);margin-bottom:2px">Last 14 days (green = ≥80% complete)</div>
+    <div class="hist">${bars}</div><div class="hist-lab">${labs}</div>`;
+}
+document.getElementById("statsBtn").onclick=()=>{
+  const show=statsEl.style.display!=="block";
+  statsEl.style.display=show?"block":"none";
+  if(show) renderStats();
+};
+
+// session timer (also feeds history dur)
+let sec=0,tHandle=null;
+const startBtn=document.getElementById("startBtn"),elapsed=document.getElementById("elapsed");
+const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+startBtn.onclick=()=>{
+  if(tHandle){ clearInterval(tHandle); tHandle=null; startBtn.textContent="▶ Resume"; startBtn.classList.remove("stop");
+    recordToday(); if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } return; }
+  elapsed.style.display="inline"; startBtn.textContent="⏸ Pause"; startBtn.classList.add("stop");
+  recordToday();
+  tHandle=setInterval(()=>{ sec++; elapsed.textContent=fmt(sec);
+    if(history[todayKey]){ history[todayKey].dur=sec; } },1000);
+  window.scrollTo({top:170,behavior:"smooth"});
+};
+window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } });
+
+// rest timer
+let rHandle=null,rLeft=0; const restclock=document.getElementById("restclock");
+document.querySelectorAll("#rest button").forEach(b=>{
+  b.onclick=()=>{ clearInterval(rHandle); rLeft=parseInt(b.dataset.s,10); restclock.textContent=rLeft;
+    rHandle=setInterval(()=>{ rLeft--; restclock.textContent=rLeft>0?rLeft:"GO!";
+      if(rLeft<=0){ clearInterval(rHandle); setTimeout(()=>restclock.textContent="—",1500); } },1000); };
+});
+
+render(todayName);
+</script>
+</body>
+</html>
