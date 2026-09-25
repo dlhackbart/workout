@@ -91,6 +91,7 @@
   <span id="prog"></span>
   <button class="mini" id="statsBtn">📊 Stats</button>
   <button class="mini" id="voiceBtn">🔊 Voice</button>
+  <button class="mini" id="tvBtn">📺 Whole routine → TV</button>
   <button class="mini" id="autoBtn">📺 Auto-video</button>
   <button class="mini" id="reset">↺ reset</button>
 </div>
@@ -106,7 +107,7 @@
   <div class="cap" id="vpcap"></div>
   <div class="frame" id="vpframe"></div>
   <div class="sub" id="vpsub"></div>
-  <div class="btns"><button id="vpClose">Close</button><button id="vpDone">✓ Done — next</button></div>
+  <div class="btns"><button id="vpClose">Close</button><button id="vpTv" style="background:#3a7bd5;color:#fff">📺 Play on TV</button><button id="vpDone">✓ Done — next</button></div>
 </div>
 
 <script>
@@ -225,6 +226,13 @@ function openVideo(day,i){
 }
 function closeVideo(){ vp.style.display="none"; vpframe.innerHTML=""; }
 document.getElementById("vpClose").onclick=closeVideo;
+// TV: opens YouTube itself (the YouTube app on a phone), whose Cast button sends it to a Roku / smart TV / Chromecast.
+// Once the YouTube app is cast-connected, every video opened this way plays on the TV.
+document.getElementById("vpTv").onclick=()=>{ const it=PLAN[vpDay].items[vpIdx]; closeVideo();
+  window.open("https://www.youtube.com/watch?v="+it.v,"_blank"); };
+document.getElementById("tvBtn").onclick=()=>{
+  const ids=[...new Set(PLAN[current].items.filter(x=>x.v).map(x=>x.v))];
+  window.open("https://www.youtube.com/watch_videos?video_ids="+ids.join(","),"_blank"); };
 document.getElementById("vpDone").onclick=()=>{
   const day=vpDay,i=vpIdx; closeVideo();
   const li=listEl.children[i]; if(day===current && li && !li.classList.contains("done")) li.click();
