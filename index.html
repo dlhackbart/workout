@@ -7,6 +7,7 @@
 <style>
   :root { --bg:#11151c; --card:#1b2230; --acc:#4caf6d; --acc2:#3a7bd5; --txt:#e8edf4; --mut:#8a97a8; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { overflow-x:hidden; }
   body { margin:0; font-family:-apple-system,Segoe UI,Roboto,system-ui,sans-serif; background:var(--bg); color:var(--txt); }
   header { padding:18px 16px 8px; }
   h1 { font-size:1.05rem; margin:0; color:var(--mut); font-weight:600; letter-spacing:.3px; }
@@ -17,12 +18,12 @@
          border:1px solid transparent; font-size:.85rem; cursor:pointer; }
   .tab.active { color:#fff; border-color:var(--acc); background:#22304a; }
   .tab.today::after { content:" •"; color:var(--acc); }
-  #bar { display:flex; align-items:center; gap:10px; padding:0 16px 10px; flex-wrap:wrap; }
+  #bar { display:flex; align-items:center; gap:8px 10px; padding:0 16px 10px; flex-wrap:wrap; }
   button.go { background:var(--acc); color:#06210f; border:0; padding:12px 18px; border-radius:12px;
               font-size:1rem; font-weight:700; cursor:pointer; }
   button.go.stop { background:#c0563f; color:#fff; }
   #elapsed { font-variant-numeric:tabular-nums; font-size:1.1rem; color:var(--mut); }
-  #prog { margin-left:auto; font-size:.9rem; color:var(--mut); }
+  #prog { font-size:.9rem; color:var(--mut); }
   .mini { font-size:.8rem; color:var(--acc2); background:none; border:0; cursor:pointer; }
   ul { list-style:none; margin:0; padding:0 12px 96px; }
   li { background:var(--card); margin:8px 4px; border-radius:14px; padding:12px; display:flex;
@@ -43,7 +44,7 @@
   .vhead { font-size:.72rem; color:var(--mut); margin:12px 0 4px; text-transform:uppercase; letter-spacing:.4px; }
   .vrow { display:flex; justify-content:space-between; gap:10px; font-size:.82rem; padding:5px 0; border-top:1px solid #222b3a; }
   .vrow span:last-child { color:var(--txt); text-align:right; white-space:nowrap; }
-  .vid { width:96px; height:54px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
+  .vid { width:84px; height:48px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
          border:1px solid #2c3850; position:relative; }
   .vid img { width:100%; height:100%; object-fit:cover; }
   .vid::after { content:"▶"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
