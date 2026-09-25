@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Workout — Strength & Mobility</title>
+<title>Workout — Unlock & Build</title>
 <style>
   :root { --bg:#11151c; --card:#1b2230; --acc:#4caf6d; --acc2:#3a7bd5; --txt:#e8edf4; --mut:#8a97a8; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -11,6 +11,7 @@
   header { padding:18px 16px 8px; }
   h1 { font-size:1.05rem; margin:0; color:var(--mut); font-weight:600; letter-spacing:.3px; }
   #focus { font-size:1.7rem; font-weight:700; margin:2px 0 0; }
+  #sub { font-size:.85rem; color:var(--mut); margin-top:4px; }
   #tabs { display:flex; gap:6px; overflow-x:auto; padding:8px 16px 12px; }
   .tab { flex:0 0 auto; padding:8px 12px; border-radius:20px; background:var(--card); color:var(--mut);
          border:1px solid transparent; font-size:.85rem; cursor:pointer; }
@@ -32,11 +33,9 @@
   li.done .box { border-color:var(--acc); background:var(--acc); color:#06210f; }
   .mid { flex:1 1 auto; min-width:0; }
   .nm { font-size:1.05rem; font-weight:600; }
-  .dt { font-size:.85rem; color:var(--mut); margin-top:2px; }
+  .dt { font-size:.85rem; color:var(--txt); margin-top:2px; }
+  .cue { font-size:.8rem; color:var(--mut); margin-top:3px; line-height:1.3; }
   li.done .nm { text-decoration:line-through; }
-  .wt { margin-top:6px; display:flex; align-items:center; gap:6px; font-size:.8rem; color:var(--mut); }
-  .wt input { width:62px; background:#0d1117; border:1px solid #2c3850; color:var(--txt); border-radius:8px;
-              padding:6px 8px; font-size:.95rem; }
   li.active { border-color:var(--acc2); box-shadow:0 0 0 1px var(--acc2) inset; }
   .logrow { margin-top:8px; display:flex; align-items:center; gap:7px; font-size:.8rem; color:var(--mut); flex-wrap:wrap; }
   .logrow .num { width:56px; background:#0d1117; border:1px solid #2c3850; color:var(--txt); border-radius:8px;
@@ -44,39 +43,45 @@
   .vhead { font-size:.72rem; color:var(--mut); margin:12px 0 4px; text-transform:uppercase; letter-spacing:.4px; }
   .vrow { display:flex; justify-content:space-between; gap:10px; font-size:.82rem; padding:5px 0; border-top:1px solid #222b3a; }
   .vrow span:last-child { color:var(--txt); text-align:right; white-space:nowrap; }
-  .clip { width:64px; height:64px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
-          border:1px solid #2c3850; display:flex; align-items:center; justify-content:center; position:relative; }
-  .clip img { width:100%; height:100%; object-fit:cover; }
-  .clip .ph { font-size:.62rem; color:#5e6b7d; text-align:center; line-height:1.2; }
+  .vid { width:96px; height:54px; flex:0 0 auto; border-radius:10px; overflow:hidden; background:#0d1117;
+         border:1px solid #2c3850; position:relative; }
+  .vid img { width:100%; height:100%; object-fit:cover; }
+  .vid::after { content:"▶"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                color:#fff; font-size:1.2rem; background:rgba(0,0,0,.28); }
   #rest { position:fixed; left:0; right:0; bottom:0; background:#0d1117; border-top:1px solid #222b3a;
           display:flex; align-items:center; justify-content:center; gap:14px; padding:12px; z-index:5; }
   #rest button { background:var(--acc2); color:#fff; border:0; border-radius:10px; padding:10px 14px; font-size:.95rem; cursor:pointer; }
   #restclock { font-size:1.4rem; font-variant-numeric:tabular-nums; min-width:62px; text-align:center; }
   #done-msg { text-align:center; padding:18px; font-size:1.2rem; color:var(--acc); display:none; }
   a.log { color:var(--acc2); font-size:.85rem; text-decoration:none; }
-  /* stats panel */
   #stats { display:none; margin:0 16px 12px; background:var(--card); border:1px solid #222b3a; border-radius:14px; padding:14px; }
   .stat-row { display:flex; gap:18px; margin-bottom:12px; }
   .stat { text-align:center; }
   .stat .v { font-size:1.6rem; font-weight:800; color:var(--acc); }
   .stat .l { font-size:.72rem; color:var(--mut); text-transform:uppercase; letter-spacing:.4px; }
   .hist { display:flex; align-items:flex-end; gap:3px; height:54px; margin-top:6px; }
-  .hist .bar { flex:1; background:#2c3850; border-radius:3px 3px 0 0; position:relative; min-height:3px; }
+  .hist .bar { flex:1; background:#2c3850; border-radius:3px 3px 0 0; min-height:3px; }
   .hist .bar.full { background:var(--acc); }
   .hist .bar.today { outline:1px solid var(--acc2); }
   .hist-lab { display:flex; gap:3px; margin-top:4px; }
   .hist-lab span { flex:1; text-align:center; font-size:.55rem; color:#5e6b7d; }
-  /* lightbox */
-  #lb { display:none; position:fixed; inset:0; background:rgba(0,0,0,.86); z-index:20; align-items:center; justify-content:center; flex-direction:column; gap:14px; padding:20px; }
-  #lb img { max-width:90vw; max-height:64vh; border-radius:14px; }
-  #lb .cap { font-size:1.2rem; font-weight:700; }
-  #lb .sub { color:var(--mut); font-size:.9rem; }
+  /* video player */
+  #vp { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:20; flex-direction:column;
+        align-items:center; justify-content:center; gap:12px; padding:16px; }
+  #vp .frame { width:min(960px,100%); aspect-ratio:16/9; background:#000; border-radius:12px; overflow:hidden; }
+  #vp iframe { width:100%; height:100%; border:0; }
+  #vp .cap { font-size:1.2rem; font-weight:700; text-align:center; }
+  #vp .sub { color:var(--mut); font-size:.9rem; text-align:center; max-width:640px; }
+  #vp .btns { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  #vp .btns button { border:0; border-radius:10px; padding:10px 16px; font-size:.95rem; cursor:pointer; }
+  #vpClose { background:#2c3850; color:#fff; } #vpDone { background:var(--acc); color:#06210f; font-weight:700; }
 </style>
 </head>
 <body>
 <header>
   <h1 id="dayname"></h1>
   <div id="focus"></div>
+  <div id="sub"></div>
 </header>
 <div id="tabs"></div>
 <div id="bar">
@@ -85,105 +90,75 @@
   <span id="prog"></span>
   <button class="mini" id="statsBtn">📊 Stats</button>
   <button class="mini" id="voiceBtn">🔊 Voice</button>
-  <button class="mini" id="reset">↺ reset day</button>
+  <button class="mini" id="autoBtn">📺 Auto-video</button>
+  <button class="mini" id="reset">↺ reset</button>
 </div>
 <div id="stats"></div>
 <ul id="list"></ul>
-<div id="done-msg">✅ Workout complete — nice work!<br><a class="log" href="weight_log.md">Open weight log →</a></div>
+<div id="done-msg">✅ Routine complete — nice work!<br><a class="log" href="weight_log.md">Open weight log →</a></div>
 <div id="rest">
+  <button data-s="30">Rest 30s</button>
   <button data-s="60">Rest 60s</button>
-  <button data-s="90">Rest 90s</button>
   <span id="restclock">—</span>
 </div>
-<div id="lb"><img id="lbimg" alt=""><div class="cap" id="lbcap"></div><div class="sub">tap anywhere to close</div></div>
+<div id="vp">
+  <div class="cap" id="vpcap"></div>
+  <div class="frame" id="vpframe"></div>
+  <div class="sub" id="vpsub"></div>
+  <div class="btns"><button id="vpClose">Close</button><button id="vpDone">✓ Done — next</button></div>
+</div>
 
 <script>
-// Names below are the accepted/standard exercise names; c = clip id (animated start/finish frames in clips/).
+// v2 (2026-09-25): two alternating routines built around undoing years of sitting.
+// v = YouTube video id (all checked embeddable 2026-09-25; physical therapist / clinic channels where possible).
+// v1 (7-day strength plan) is archived as workout_v1_2026-06-26.html.
 const PLAN = {
-  Monday:    { focus:"Strength Day A", items:[
-    {n:"Goblet Squat", d:"3 × 10  ·  25–45 lb", c:"goblet-squat"},
-    {n:"Romanian Deadlift (RDL)", d:"3 × 10  ·  25–45 lb", c:"rdl"},
-    {n:"One-Arm Dumbbell Row", d:"3 × 10 / arm  ·  20–40 lb", c:"db-row"},
-    {n:"Seated Dumbbell Press", d:"3 × 10  ·  15–25 lb", c:"shoulder-press"},
-    {n:"Kneeling Hip Flexor Stretch", d:"30s × 3 dir/side", c:"hip-flexor-stretch"},
-    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"},
-    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
-    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"} ]},
-  Tuesday:   { focus:"Mobility & Recovery Day", items:[
-    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
-    {n:"Split-Stance Hip Flexor Stretch — Left", d:"30–45s", c:"split-stance-hip"},
-    {n:"Split-Stance Hip Flexor Stretch — Right", d:"30–45s", c:"split-stance-hip"},
-    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
-    {n:"Romanian Deadlift — Dowel (form drill)", d:"2 × 10", c:"rdl-dowel"},
-    {n:"Monster Walk (Banded)", d:"2 × 10 each way", c:"sumo-walk"},
-    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
-    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
-    {n:"Walk", d:"20–30 min", c:"walk"} ]},
-  Wednesday: { focus:"Strength Day B", items:[
-    {n:"Dumbbell Step-Up", d:"3 × 10 / leg  ·  15–30 lb", c:"step-up"},
-    {n:"Split Squat with Dumbbells (Bulgarian)", d:"3 × 8–10 / leg  ·  15–30 lb", c:"bulgarian-split-squat"},
-    {n:"Incline Dumbbell Press", d:"3 × 10  ·  20–35 lb", c:"incline-bench"},
-    {n:"Dumbbell Thruster (Squat to Press)", d:"3 × 10  ·  15–25 lb", c:"squat-press"},
-    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
-    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
-    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"},
-    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"} ]},
-  Thursday:  { focus:"Mobility & Core Rotation Day", items:[
-    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
-    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
-    {n:"Split-Stance Hip Flexor Stretch — Left", d:"30–45s", c:"split-stance-hip"},
-    {n:"Split-Stance Hip Flexor Stretch — Right", d:"30–45s", c:"split-stance-hip"},
-    {n:"Romanian Deadlift — Dowel (form drill)", d:"2 × 10", c:"rdl-dowel"},
-    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
-    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
-    {n:"Overhead Wood Chop (Ax Chop)", d:"2 × 10 / side", c:"ax-chop"},
-    {n:"Walk", d:"20–30 min", c:"walk"} ]},
-  Friday:    { focus:"Strength Day C", items:[
-    {n:"Stiff-Legged Dumbbell Deadlift", d:"3 × 8–10  ·  30–50 lb", c:"db-deadlift"},
-    {n:"Goblet Squat", d:"3 × 10  ·  25–45 lb", c:"goblet-squat"},
-    {n:"One-Arm Dumbbell Row", d:"3 × 10–12 / arm  ·  20–40 lb", c:"db-row"},
-    {n:"Seated Dumbbell Press", d:"3 × 10  ·  15–25 lb", c:"shoulder-press"},
-    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
-    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
-    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"},
-    {n:"T-Spine Rotation (Doorway)", d:"8–10 / side", c:"tspine-doorway"} ]},
-  Saturday:  { focus:"Functional Movement & Mobility", items:[
-    {n:"Monster Walk (Banded)", d:"2 × 10 each way", c:"sumo-walk"},
-    {n:"Wood Chop (Two-Way)", d:"2 × 10 / side", c:"two-way-chops"},
-    {n:"Pick-Up and Pull w/ Dumbbell", d:"2 × 10 / side", c:"pickup-pull"},
-    {n:"Overhead Wood Chop (Ax Chop)", d:"2 × 10 / side", c:"ax-chop"},
-    {n:"IT Band & Glute Stretch", d:"30s / side", c:"itb-stretch"},
-    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
-    {n:"Split-Stance Hip Flexor Stretch — L & R", d:"30–45s each", c:"split-stance-hip"},
-    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
-    {n:"Walk", d:"30 min", c:"walk"} ]},
-  Sunday:    { focus:"Recovery & Reset", items:[
-    {n:"Light Walking", d:"20–30 min", c:"walk"},
-    {n:"Deep Breathing", d:"5 min"},
-    {n:"Kneeling Hip Flexor Stretch", d:"30s / side", c:"hip-flexor-stretch"},
-    {n:"Seated Glute (Piriformis) Stretch", d:"30–45s / side", c:"piriformis-stretch"},
-    {n:"Doorframe Walk-Around", d:"1–2 min", c:"doorframe-walk"},
-    {n:"Thoracic (Torso) Rotation", d:"8–10 / side", c:"thoracic-rotation"},
-    {n:"Review Weekly Progress", d:""},
-    {n:"Record Weight", d:""},
-    {n:"Plan Upcoming Week", d:""} ]}
+  A: { tab:"A · Unlock", focus:"Routine A — Unlock", sub:"Mobility · ~25 min · move slowly, breathe, never force a stretch", items:[
+    {n:"Cat-Cow", d:"10 slow reps", k:"One vertebra at a time. Breathe out as you round up, in as you sag.", v:"1Y0YjXS9sKI"},
+    {n:"Prone Press-Up", d:"2 × 10  ·  2s pause at top", k:"Your upward dog, gentler: hips stay on the floor, back muscles stay relaxed, arms do the work.", v:"Sws_GwrlYO0"},
+    {n:"Half-Kneeling Hip Flexor Stretch", d:"2 × 45s / side", k:"Squeeze the glute of the down knee and tuck the pelvis first — THEN shift forward a little. The #1 stretch for chair hips.", v:"gqoPYLUgP48"},
+    {n:"90/90 Hip Switches", d:"2 × 8 / side", k:"Hands behind you for support. Slow, controlled; only as far as the hips allow.", v:"Ju4RZ23zqZQ"},
+    {n:"Open Book (side-lying)", d:"2 × 8 / side", k:"Knees stacked and pinned. Rotate through the upper back; follow the hand with your eyes.", v:"OW6YHlxY6JI"},
+    {n:"Supine Hamstring Stretch (strap)", d:"2 × 45s / side", k:"Use a towel or band. Keep the knee nearly straight; gentle pull, no bouncing.", v:"Il1L75v6gq0"},
+    {n:"Doorway Pec Stretch", d:"2 × 30s", k:"Elbows at shoulder height, step through until you feel the chest open. Undo keyboard shoulders.", v:"M850sCj9LHQ"},
+    {n:"Chin Tucks", d:"2 × 10  ·  3s hold", k:"Make a double chin — slide the head straight back, don't nod down.", v:"7rnlAVhAK-8"},
+    {n:"Wall Angels", d:"2 × 8", k:"Back, head and arms against the wall; slide up only as far as you keep contact.", v:"U85tG04hlUs"},
+    {n:"Crocodile Breathing", d:"2 min", k:"Face down, forehead on hands. Breathe into your belly and lower back so it rises. Finish calm.", v:"N7q6OI1nYcU"} ]},
+  B: { tab:"B · Build", focus:"Routine B — Build", sub:"Back-first strength · ~25–30 min · weeks 1–2: stop with 3–4 reps in the tank", items:[
+    {n:"Cat-Cow (warm-up)", d:"1 min", k:"Loosen up before the core work.", v:"1Y0YjXS9sKI"},
+    {n:"McGill Curl-Up", d:"3 × 5  ·  8–10s holds", k:"One knee bent, hands under the low back. Lift head and shoulders only an inch — the spine does not bend.", v:"vLpHJ1Cxj6k"},
+    {n:"Bird Dog", d:"3 × 5 / side  ·  8–10s holds", k:"Reach long, not high. Back stays flat like a table — no rotation.", v:"S1QbyYZaXIg"},
+    {n:"Side Plank (from knees)", d:"3 × 10–15s / side", k:"Straight line knees to head, hips forward. Move to full side plank when 30s is easy.", v:"nHfW1IRF7BI"},
+    {n:"Glute Bridge", d:"3 × 12  ·  2s squeeze at top", k:"Push through the heels, squeeze the glutes — don't arch the low back to get higher.", v:"PhTDzR0TpZs"},
+    {n:"Prone Y-T Raises", d:"2 × 8 each shape", k:"Face down, thumbs up. Lift with the upper back, not the neck. No weight yet.", v:"rKVuKuR4SA4"},
+    {n:"Chest-Supported Dumbbell Row", d:"3 × 10  ·  10–20 lb", k:"Chest on the incline bench so the low back is fully supported. Pull elbows to hips, squeeze shoulder blades.", v:"tvk5Fb2K0Ns"},
+    {n:"Hip Hinge → Dumbbell RDL", d:"3 × 10  ·  dowel wks 1–2, then 10–20 lb", k:"Dowel touches head, upper back and tailbone the whole rep. Push the hips back; knees soft.", v:"4_31Jnmt7cE"},
+    {n:"Box Squat to Bench", d:"3 × 10  ·  bodyweight", k:"Sit back to the bench, touch lightly, stand up through the heels. Hands forward for balance.", v:"Lj56usJbLiU"},
+    {n:"Incline Push-Up", d:"3 × 8–10", k:"Hands on the counter or bench. Body in one line. Lower the incline as it gets easy.", v:"49jfZ_z7-us"} ]},
+  D: { tab:"Desk Reset", focus:"Desk Reset — 2 min", sub:"Every hour you sit. Not a workout — a break from the chair.", items:[
+    {n:"Stand Up & Walk", d:"1 min", k:"Walk to the kitchen and back. Just get out of the chair."},
+    {n:"Standing Back Extension", d:"5 reps", k:"Hands on your low back, lean back gently. The standing version of your press-up.", v:"0AejdxtYrXI"},
+    {n:"Standing Hip Flexor Stretch", d:"20s / side", k:"Tuck the pelvis, squeeze the back glute.", v:"ljCDEb_MIto"},
+    {n:"Chin Tucks", d:"5 reps", k:"Slide the head straight back.", v:"7rnlAVhAK-8"} ]}
 };
-const ORDER=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-const todayName=ORDER[new Date().getDay()];
+const ORDER=["A","B","D"];
 const dkey=dt=>`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
+// Alternate A/B daily, counted from 2026-09-25 (= A). Miss a day? just do the other one next — tap its tab.
+const dayNum=d=>Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000);
+const todayName=((dayNum(new Date())-dayNum(new Date(2026,8,25)))%2+2)%2===0?"A":"B";
 const todayKey=dkey(new Date());
 let current=todayName;
 
 function load(k,def){ try{ return JSON.parse(localStorage.getItem(k)) ?? def; }catch(e){ return def; } }
 function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-let weights=load("wk_weights",{});
-let prog=load("wk_prog",{});
-let history=load("wk_history",{});       // {date:{day,done,total,dur}}
+let weights=load("wk2_weights",{});
+let prog=load("wk2_prog",{});
+let history=load("wk2_history",{});       // {date:{day,done,total,dur}}
 let ch=false;
 for(const k in prog){ if(!k.startsWith(todayKey+"|")){ delete prog[k]; ch=true; } }
-if(ch) save("wk_prog",prog);
+if(ch) save("wk2_prog",prog);
 let voiceOn=load("wk_voice",true);
-// pick a soft, natural-sounding voice (falls back gracefully)
+let autoVid=load("wk2_autovid",false);
 let chosenVoice=null;
 function pickVoice(){
   if(!("speechSynthesis"in window))return;
@@ -194,86 +169,79 @@ function pickVoice(){
   chosenVoice=vs.find(x=>/en[-_]US/i.test(x.lang)) || vs.find(x=>/^en/i.test(x.lang)) || vs[0];
 }
 if("speechSynthesis"in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
-// turn the terse plan text into natural spoken phrasing
 function spoken(d){ if(!d) return "";
   return d
-    .replace(/(\d+)\s*×\s*(\d+(?:\s*[–-]\s*\d+)?)/g,"$1 sets of $2")  // 3 × 10 -> 3 sets of 10
+    .replace(/(\d+)\s*×\s*(\d+(?:\s*[–-]\s*\d+)?)/g,"$1 sets of $2")
     .replace(/×/g," by ")
-    .replace(/\s*\/\s*/g," per ")                                     // /arm /side /leg -> per ...
+    .replace(/\s*\/\s*/g," per ")
     .replace(/[·•]/g,". ")
-    .replace(/(\d)\s*[–-]\s*(\d)/g,"$1 to $2")                        // 25–45 -> 25 to 45
+    .replace(/→/g," then ")
+    .replace(/(\d)\s*[–-]\s*(\d)/g,"$1 to $2")
     .replace(/\blb\b/g,"pounds")
     .replace(/\bmin\b/g,"minutes")
+    .replace(/\bwks\b/g,"weeks")
     .replace(/(\d)\s*s\b/g,"$1 seconds")
-    .replace(/\bdir\b/g,"directions")
     .replace(/\s+/g," ").trim();
 }
 function say(t){ if(!voiceOn||!("speechSynthesis"in window)||!t)return;
   try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t);
     if(chosenVoice) u.voice=chosenVoice; u.rate=0.9; u.pitch=1.05; u.volume=1;
     speechSynthesis.speak(u);}catch(e){} }
-function nextUnchecked(day){ const items=PLAN[day].items;
-  for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]) return items[i]; } return null; }
+function nextIdx(day){ const items=PLAN[day].items;
+  for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]) return i; } return -1; }
 // ---- planned vs actual logging ----
-let logs=load("wk_logs",{});            // logs[date]={day, items:{idx:{name,plannedSets,plannedWt,plannedWtText,actualSets,actualWt}}}
+let logs=load("wk2_logs",{});
 function planInfo(d){ let sets=null,lo=null,hi=null,wtText="";
   const m=(d||"").match(/(\d+)\s*×/); if(m) sets=+m[1];
   const w=(d||"").match(/(\d+)\s*[–-]\s*(\d+)\s*lb/);
   if(w){ lo=+w[1]; hi=+w[2]; wtText=w[1]+"–"+w[2]+" lb"; }
-  else { const s=(d||"").match(/(\d+)\s*lb/); if(s){ lo=hi=+s[1]; wtText=s[1]+" lb"; } }
   return {sets, wtText, wtMid: lo!=null?Math.round((lo+hi)/2):null}; }
 function saveActual(day,i,it,sets,wt){ if(day!==todayName)return;
   if(!logs[todayKey]) logs[todayKey]={day:todayName,items:{}};
   const pi=planInfo(it.d);
   logs[todayKey].items[i]={name:it.n, plannedSets:pi.sets, plannedWt:pi.wtMid, plannedWtText:pi.wtText,
     actualSets:(sets===""||sets==null)?null:+sets, actualWt:(wt===""||wt==null)?null:+wt};
-  save("wk_logs",logs); }
-function askLine(it){ const pi=planInfo(it.d);
-  if(pi.sets!=null && pi.wtMid!=null) return "How many sets, and what weight? You're planned for "+pi.sets+" sets at about "+pi.wtMid+" pounds. Adjust below if you'd like.";
-  if(pi.sets!=null) return "You're planned for "+pi.sets+" sets. Adjust below if you'd like.";
-  return ""; }
-function setActive(day){ let idx=-1; const items=PLAN[day].items;
-  for(let i=0;i<items.length;i++){ if(!prog[todayKey+"|"+day+"|"+i]){ idx=i; break; } }
+  save("wk2_logs",logs); }
+function setActive(day){ const idx=nextIdx(day);
   [...listEl.children].forEach((li,i)=>li.classList.toggle("active", i===idx)); }
 
 const tabsEl=document.getElementById("tabs"),listEl=document.getElementById("list");
-const focusEl=document.getElementById("focus"),daynameEl=document.getElementById("dayname");
+const focusEl=document.getElementById("focus"),daynameEl=document.getElementById("dayname"),subEl=document.getElementById("sub");
 const progEl=document.getElementById("prog"),doneMsg=document.getElementById("done-msg");
 const statsEl=document.getElementById("stats");
-const lb=document.getElementById("lb"),lbimg=document.getElementById("lbimg"),lbcap=document.getElementById("lbcap");
 
-function clipEl(c,name){
-  const wrap=document.createElement("div"); wrap.className="clip";
-  const img=document.createElement("img"); img.alt=name;
-  const f0="clips/"+c+"-0.jpg", f1="clips/"+c+"-1.jpg";
-  let frame=0, two=true, timer=null;
-  const probe=new Image(); probe.onload=()=>{}; probe.onerror=()=>{ two=false; }; probe.src=f1;
-  img.src=f0;
-  img.onerror=()=>{ wrap.innerHTML='<span class="ph">clip<br>soon</span>'; if(timer)clearInterval(timer); };
-  img.onload=()=>{ if(!timer) timer=setInterval(()=>{ if(!two)return; frame^=1; img.src=frame?f1:f0; },900); };
-  wrap.appendChild(img);
-  wrap.onclick=e=>{ e.stopPropagation();
-    if(wrap.querySelector(".ph"))return;
-    lbcap.textContent=name; lbimg.src=img.src; lb.style.display="flex";
-    lb._t&&clearInterval(lb._t); let g=0;
-    lb._t=setInterval(()=>{ g^=1; lbimg.src=(g&&two)?f1:f0; },800);
-  };
-  return wrap;
+// ---- video player ----
+const vp=document.getElementById("vp"),vpframe=document.getElementById("vpframe");
+let vpIdx=-1, vpDay=null;
+function openVideo(day,i){
+  const it=PLAN[day].items[i]; if(!it.v) return;
+  vpIdx=i; vpDay=day;
+  document.getElementById("vpcap").textContent=it.n+"  ·  "+it.d;
+  document.getElementById("vpsub").textContent=it.k||"";
+  // loops so it keeps playing while you do the sets; muted-free so you hear the coaching
+  vpframe.innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${it.v}?autoplay=1&loop=1&playlist=${it.v}&rel=0&modestbranding=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+  vp.style.display="flex";
 }
-lb.onclick=()=>{ lb.style.display="none"; lb._t&&clearInterval(lb._t); };
+function closeVideo(){ vp.style.display="none"; vpframe.innerHTML=""; }
+document.getElementById("vpClose").onclick=closeVideo;
+document.getElementById("vpDone").onclick=()=>{
+  const day=vpDay,i=vpIdx; closeVideo();
+  const li=listEl.children[i]; if(day===current && li && !li.classList.contains("done")) li.click();
+};
 
 function recordToday(){
   if(current!==todayName) return;
   const items=PLAN[todayName].items;
   let done=0; items.forEach((_,i)=>{ if(prog[todayKey+"|"+todayName+"|"+i]) done++; });
   history[todayKey]={day:todayName, done, total:items.length, dur:(history[todayKey]&&history[todayKey].dur)||0};
-  save("wk_history",history);
+  save("wk2_history",history);
 }
 
 function render(day){
   current=day;
-  daynameEl.textContent=(day===todayName?"TODAY · ":"")+day;
+  daynameEl.textContent=(day===todayName?"TODAY · ":"")+new Date().toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
   focusEl.textContent=PLAN[day].focus;
+  subEl.textContent=PLAN[day].sub;
   [...tabsEl.children].forEach(t=>t.classList.toggle("active",t.dataset.day===day));
   listEl.innerHTML="";
   PLAN[day].items.forEach((it,i)=>{
@@ -282,33 +250,40 @@ function render(day){
     if(prog[pkey]) li.classList.add("done");
     const box=document.createElement("div"); box.className="box"; box.textContent="✓";
     const mid=document.createElement("div"); mid.className="mid";
-    mid.innerHTML=`<div class="nm">${it.n}</div>${it.d?`<div class="dt">${it.d}</div>`:""}`;
+    mid.innerHTML=`<div class="nm">${it.n}</div>${it.d?`<div class="dt">${it.d}</div>`:""}${it.k?`<div class="cue">${it.k}</div>`:""}`;
     const pi=planInfo(it.d);
-    if(pi.sets!=null || (it.d && it.d.includes("lb"))){
+    if(pi.sets!=null){
       const cur=(logs[todayKey]&&logs[todayKey].items[i])||{};
       const row=document.createElement("div"); row.className="logrow"; row.onclick=e=>e.stopPropagation();
       const sIn=document.createElement("input"); sIn.type="number"; sIn.min=0; sIn.inputMode="numeric"; sIn.className="num";
-      sIn.value=cur.actualSets!=null?cur.actualSets:(pi.sets!=null?pi.sets:"");
+      sIn.value=cur.actualSets!=null?cur.actualSets:pi.sets;
       let wIn=null;
-      if(it.d.includes("lb")){
+      if(pi.wtMid!=null){
         wIn=document.createElement("input"); wIn.type="number"; wIn.min=0; wIn.inputMode="numeric"; wIn.className="num";
-        wIn.value=cur.actualWt!=null?cur.actualWt:(weights[it.c]!=null?weights[it.c]:(pi.wtMid!=null?pi.wtMid:""));
+        wIn.value=cur.actualWt!=null?cur.actualWt:(weights[it.n]!=null?weights[it.n]:pi.wtMid);
       }
-      const sync=()=>{ if(wIn&&it.c&&wIn.value!==""){ weights[it.c]=wIn.value; save("wk_weights",weights);} saveActual(day,i,it,sIn.value,wIn?wIn.value:""); };
+      const sync=()=>{ if(wIn&&wIn.value!==""){ weights[it.n]=wIn.value; save("wk2_weights",weights);} saveActual(day,i,it,sIn.value,wIn?wIn.value:""); };
       sIn.oninput=sync; if(wIn) wIn.oninput=sync;
       row.append("Sets",sIn); if(wIn) row.append("Weight",wIn,"lb");
       mid.appendChild(row);
       if(!(logs[todayKey]&&logs[todayKey].items[i])) saveActual(day,i,it,sIn.value,wIn?wIn.value:"");
     }
     li.appendChild(box); li.appendChild(mid);
-    if(it.c) li.appendChild(clipEl(it.c,it.n));
+    if(it.v){
+      const vid=document.createElement("div"); vid.className="vid"; vid.title="Play demo video";
+      vid.innerHTML=`<img alt="" loading="lazy" src="https://i.ytimg.com/vi/${it.v}/mqdefault.jpg">`;
+      vid.onclick=e=>{ e.stopPropagation(); openVideo(day,i); };
+      li.appendChild(vid);
+    }
     li.onclick=()=>{
       li.classList.toggle("done");
       const justDone=li.classList.contains("done");
       if(justDone) prog[pkey]=true; else delete prog[pkey];
-      save("wk_prog",prog); recordToday(); updateProg(); setActive(day);
-      if(justDone && day===current){ const nx=nextUnchecked(day);
-        if(nx) say("Nice work. Next up, "+nx.n+". "+spoken(nx.d)+" "+askLine(nx)); else say("That's everything. Great job today."); }
+      save("wk2_prog",prog); recordToday(); updateProg(); setActive(day);
+      if(justDone && day===current){ const nx=nextIdx(day);
+        if(nx>=0){ const n=PLAN[day].items[nx]; say("Nice work. Next up, "+n.n+". "+spoken(n.d));
+          if(autoVid && n.v) setTimeout(()=>openVideo(day,nx),2500); }
+        else say("That's everything. Great job today."); }
     };
     listEl.appendChild(li);
   });
@@ -325,16 +300,16 @@ function updateProg(){
 ORDER.forEach(day=>{
   const t=document.createElement("div");
   t.className="tab"+(day===todayName?" today":"");
-  t.dataset.day=day; t.textContent=day.slice(0,3);
+  t.dataset.day=day; t.textContent=PLAN[day].tab;
   t.onclick=()=>render(day);
   tabsEl.appendChild(t);
 });
 document.getElementById("reset").onclick=()=>{
   PLAN[current].items.forEach((_,i)=>delete prog[todayKey+"|"+current+"|"+i]);
-  save("wk_prog",prog); recordToday(); render(current);
+  save("wk2_prog",prog); recordToday(); render(current);
 };
 
-// ---- stats / scoring ----
+// ---- stats ----
 function pctOf(h){ return h&&h.total ? h.done/h.total : 0; }
 function renderStats(){
   let streak=0, cur=new Date();
@@ -360,23 +335,11 @@ function renderStats(){
     </div>
     <div style="font-size:.72rem;color:var(--mut);margin-bottom:2px">Last 14 days (green = ≥80% complete)</div>
     <div class="hist">${bars}</div><div class="hist-lab">${labs}</div>`;
-  // planned vs actual: all-time adherence + today's detail
-  let lift=0,onp=0;
-  for(const dk in logs){ for(const k in logs[dk].items){ const it=logs[dk].items[k];
-    if(it.plannedSets==null && it.plannedWt==null) continue; lift++;
-    const okS=it.actualSets==null||it.plannedSets==null||it.actualSets>=it.plannedSets;
-    const okW=it.actualWt==null||it.plannedWt==null||it.actualWt>=it.plannedWt;
-    if(okS&&okW) onp++; } }
   const L=logs[todayKey]; let v="";
   if(L){ for(const k in L.items){ const it=L.items[k];
-    if(it.plannedSets==null && it.plannedWt==null) continue;
     let right=`${it.actualSets??"–"}/${it.plannedSets??"–"} sets`;
-    if(it.plannedWt!=null||it.actualWt!=null){
-      const dv=(it.actualWt!=null&&it.plannedWt!=null)?it.actualWt-it.plannedWt:null;
-      const ar=dv==null?"":(dv>0?` 🔼+${dv}`:(dv<0?` 🔽${dv}`:" ✓"));
-      right+=` · ${it.actualWt??"–"}/${it.plannedWt??"–"} lb${ar}`; }
+    if(it.plannedWt!=null||it.actualWt!=null) right+=` · ${it.actualWt??"–"}/${it.plannedWt??"–"} lb`;
     v+=`<div class="vrow"><span>${it.name}</span><span>${right}</span></div>`; } }
-  if(lift) statsEl.innerHTML+=`<div class="vhead">On-plan all-time: ${Math.round(onp/lift*100)}% of ${lift} lifts (actual ≥ planned)</div>`;
   if(v) statsEl.innerHTML+=`<div class="vhead">Today — actual / planned</div>${v}`;
 }
 document.getElementById("statsBtn").onclick=()=>{
@@ -391,29 +354,34 @@ voiceBtn.onclick=()=>{
   voiceBtn.textContent=voiceOn?"🔊 Voice":"🔇 Voice";
   if(voiceOn) say("Voice on."); else if("speechSynthesis"in window) speechSynthesis.cancel();
 };
+const autoBtn=document.getElementById("autoBtn");
+const paintAuto=()=>{ autoBtn.textContent=autoVid?"📺 Auto-video: on":"📺 Auto-video: off"; };
+paintAuto();
+autoBtn.onclick=()=>{ autoVid=!autoVid; save("wk2_autovid",autoVid); paintAuto(); };
 
-// session timer (also feeds history dur)
+// session timer
 let sec=0,tHandle=null;
 const startBtn=document.getElementById("startBtn"),elapsed=document.getElementById("elapsed");
 const fmt=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 startBtn.onclick=()=>{
   if(tHandle){ clearInterval(tHandle); tHandle=null; startBtn.textContent="▶ Resume"; startBtn.classList.remove("stop");
-    recordToday(); if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } return; }
+    recordToday(); if(history[todayKey]){ history[todayKey].dur=sec; save("wk2_history",history); } return; }
   elapsed.style.display="inline"; startBtn.textContent="⏸ Pause"; startBtn.classList.add("stop");
   recordToday();
   tHandle=setInterval(()=>{ sec++; elapsed.textContent=fmt(sec);
     if(history[todayKey]){ history[todayKey].dur=sec; } },1000);
-  window.scrollTo({top:170,behavior:"smooth"});
-  const nx=nextUnchecked(current)||PLAN[current].items[0];
-  say("Let's begin, nice and easy. Today is "+PLAN[current].focus+". First up, "+nx.n+". "+spoken(nx.d)+" "+askLine(nx));
+  let nx=nextIdx(current); if(nx<0) nx=0;
+  const n=PLAN[current].items[nx];
+  say("Let's begin, nice and easy. "+PLAN[current].focus.replace("—",". ")+". First up, "+n.n+". "+spoken(n.d));
+  if(autoVid && n.v) setTimeout(()=>openVideo(current,nx),3000);
 };
-window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[todayKey].dur=sec; save("wk_history",history); } });
+window.addEventListener("beforeunload",()=>{ if(history[todayKey]){ history[todayKey].dur=sec; save("wk2_history",history); } });
 
 // rest timer
 let rHandle=null,rLeft=0; const restclock=document.getElementById("restclock");
 document.querySelectorAll("#rest button").forEach(b=>{
   b.onclick=()=>{ clearInterval(rHandle); rLeft=parseInt(b.dataset.s,10); restclock.textContent=rLeft;
-    say("Take a rest for "+rLeft+" seconds.");
+    say("Rest for "+rLeft+" seconds.");
     rHandle=setInterval(()=>{ rLeft--; restclock.textContent=rLeft>0?rLeft:"GO!";
       if(rLeft>0&&rLeft<=3) say(String(rLeft));
       if(rLeft<=0){ clearInterval(rHandle); say("Okay, back to it."); setTimeout(()=>restclock.textContent="—",1500); } },1000); };
