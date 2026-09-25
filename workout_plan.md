@@ -39,3 +39,12 @@ Missed a day? Just do the other routine next. v1 (7-day strength plan) is archiv
 Stand & walk 1 min · Standing back extension ×5 ([Pursuit PT](https://youtu.be/0AejdxtYrXI)) · Standing hip flexor stretch 20s/side ([Coury & Buehler PT](https://youtu.be/ljCDEb_MIto)) · Chin tucks ×5
 
 **Gear:** mat · incline bench · dumbbells · dowel/broomstick · towel or strap · doorway · wall.
+
+## Balance finish — end of BOTH routines (~5 min, added 2026-09-25)
+Always at the kitchen counter, hand ready to grab.
+| # | Exercise | Dose | Video |
+|---|---|---|---|
+| 1 | Feet-Together Stand | 2 × 30s, eyes open → closed when easy | [American Heart Assn](https://youtu.be/STBFBCCMXIA) |
+| 2 | Heel-to-Toe (Tandem) Stand | 2 × 30s each foot in front | [Ask Doctor Jo](https://youtu.be/ra7tzlPxnsQ) |
+| 3 | Single-Leg Stand | 2 × 10–20s / side | [Coury & Buehler PT](https://youtu.be/7SF7AYh2_Yw) |
+| 4 | Heel-to-Toe Walk | 2 × 10 steps | [National Institute on Aging](https://youtu.be/z_GKdFf3qv4) |

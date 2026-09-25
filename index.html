@@ -114,8 +114,14 @@
 // v2 (2026-09-25): two alternating routines built around undoing years of sitting.
 // v = YouTube video id (all checked embeddable 2026-09-25; physical therapist / clinic channels where possible).
 // v1 (7-day strength plan) is archived as workout_v1_2026-06-26.html.
+// Balance finish — added to the END of both routines (2026-09-25). Always at a counter, hand ready to grab.
+const BALANCE=[
+  {n:"Balance: Feet-Together Stand", d:"2 × 30s  ·  eyes open → closed when easy", k:"At the kitchen counter, hand hovering over it. Stand tall, feet touching. Close your eyes only once 30s open is steady.", v:"STBFBCCMXIA"},
+  {n:"Balance: Heel-to-Toe Stand", d:"2 × 30s / each foot in front", k:"One heel directly in front of the other toes, at the counter. Touch the counter as needed — that's the point.", v:"ra7tzlPxnsQ"},
+  {n:"Balance: Single-Leg Stand", d:"2 × 10–20s / side", k:"Light fingertip on the counter at first. Soft knee, eyes on a fixed spot ahead. Note if the left side is harder.", v:"7SF7AYh2_Yw"},
+  {n:"Balance: Heel-to-Toe Walk", d:"2 × 10 steps", k:"Along the counter, heel touching toe each step. Slow; look ahead, not at your feet.", v:"z_GKdFf3qv4"} ];
 const PLAN = {
-  A: { tab:"A · Unlock", focus:"Routine A — Unlock", sub:"Mobility · ~25 min · move slowly, breathe, never force a stretch", items:[
+  A: { tab:"A · Unlock", focus:"Routine A — Unlock", sub:"Mobility · ~30 min · move slowly, breathe, never force a stretch", items:[
     {n:"Cat-Cow", d:"10 slow reps", k:"One vertebra at a time. Breathe out as you round up, in as you sag.", v:"1Y0YjXS9sKI"},
     {n:"Prone Press-Up", d:"2 × 10  ·  2s pause at top", k:"Your upward dog, gentler: hips stay on the floor, back muscles stay relaxed, arms do the work.", v:"Sws_GwrlYO0"},
     {n:"Half-Kneeling Hip Flexor Stretch", d:"2 × 45s / side", k:"Squeeze the glute of the down knee and tuck the pelvis first — THEN shift forward a little. The #1 stretch for chair hips.", v:"gqoPYLUgP48"},
@@ -125,8 +131,8 @@ const PLAN = {
     {n:"Doorway Pec Stretch", d:"2 × 30s", k:"Elbows at shoulder height, step through until you feel the chest open. Undo keyboard shoulders.", v:"M850sCj9LHQ"},
     {n:"Chin Tucks", d:"2 × 10  ·  3s hold", k:"Make a double chin — slide the head straight back, don't nod down.", v:"7rnlAVhAK-8"},
     {n:"Wall Angels", d:"2 × 8", k:"Back, head and arms against the wall; slide up only as far as you keep contact.", v:"U85tG04hlUs"},
-    {n:"Crocodile Breathing", d:"2 min", k:"Face down, forehead on hands. Breathe into your belly and lower back so it rises. Finish calm.", v:"N7q6OI1nYcU"} ]},
-  B: { tab:"B · Build", focus:"Routine B — Build", sub:"Back-first strength · ~25–30 min · weeks 1–2: stop with 3–4 reps in the tank", items:[
+    {n:"Crocodile Breathing", d:"2 min", k:"Face down, forehead on hands. Breathe into your belly and lower back so it rises. Finish calm.", v:"N7q6OI1nYcU"}, ...BALANCE ]},
+  B: { tab:"B · Build", focus:"Routine B — Build", sub:"Back-first strength · ~30–35 min · weeks 1–2: stop with 3–4 reps in the tank", items:[
     {n:"Cat-Cow (warm-up)", d:"1 min", k:"Loosen up before the core work.", v:"1Y0YjXS9sKI"},
     {n:"McGill Curl-Up", d:"3 × 5  ·  8–10s holds", k:"One knee bent, hands under the low back. Lift head and shoulders only an inch — the spine does not bend.", v:"vLpHJ1Cxj6k"},
     {n:"Bird Dog", d:"3 × 5 / side  ·  8–10s holds", k:"Reach long, not high. Back stays flat like a table — no rotation.", v:"S1QbyYZaXIg"},
@@ -136,7 +142,7 @@ const PLAN = {
     {n:"Chest-Supported Dumbbell Row", d:"3 × 10  ·  10–20 lb", k:"Chest on the incline bench so the low back is fully supported. Pull elbows to hips, squeeze shoulder blades.", v:"tvk5Fb2K0Ns"},
     {n:"Hip Hinge → Dumbbell RDL", d:"3 × 10  ·  dowel wks 1–2, then 10–20 lb", k:"Dowel touches head, upper back and tailbone the whole rep. Push the hips back; knees soft.", v:"4_31Jnmt7cE"},
     {n:"Box Squat to Bench", d:"3 × 10  ·  bodyweight", k:"Sit back to the bench, touch lightly, stand up through the heels. Hands forward for balance.", v:"Lj56usJbLiU"},
-    {n:"Incline Push-Up", d:"3 × 8–10", k:"Hands on the counter or bench. Body in one line. Lower the incline as it gets easy.", v:"49jfZ_z7-us"} ]},
+    {n:"Incline Push-Up", d:"3 × 8–10", k:"Hands on the counter or bench. Body in one line. Lower the incline as it gets easy.", v:"49jfZ_z7-us"}, ...BALANCE ]},
   D: { tab:"Desk Reset", focus:"Desk Reset — 2 min", sub:"Every hour you sit. Not a workout — a break from the chair.", items:[
     {n:"Stand Up & Walk", d:"1 min", k:"Walk to the kitchen and back. Just get out of the chair."},
     {n:"Standing Back Extension", d:"5 reps", k:"Hands on your low back, lean back gently. The standing version of your press-up.", v:"0AejdxtYrXI"},
