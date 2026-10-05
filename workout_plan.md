@@ -35,6 +35,17 @@ Missed a day? Just do the other routine next. v1 (7-day strength plan) is archiv
 | 9 | Box Squat to Bench | 3 × 10, bodyweight | [BodyWorx Physio](https://youtu.be/Lj56usJbLiU) |
 | 10 | Incline Push-Up | 3 × 8–10 | [Tom Morrison](https://youtu.be/49jfZ_z7-us) |
 
+## Routine C — Classic (bodyweight classics, ~20–25 min, added 2026-10-05)
+Optional tab — not in the automatic A/B rotation. 3 rounds, 60s rest. Neck neutral on every rep.
+| # | Exercise | Dose | Video |
+|---|---|---|---|
+| 1 | Burpees (step-back, no jump) | 3 × 5 | [FITBODY](https://youtu.be/iUL2tndomms) |
+| 2 | Pull-Ups (negatives/band if needed) | 3 × max, 1–2 short of failure | [Runna](https://youtu.be/1rRmIzEsl_4) |
+| 3 | Sit-Ups (arms crossed on chest) | 3 × 10 | [Spine & Rehab Specialists](https://youtu.be/HmzxDbnYngE) |
+| 4 | Push-Ups | 3 × 8–10 | [Symmetry PT](https://youtu.be/9m3tq2A17BI) |
+| 5 | Dumbbell Curls | 3 × 10, 15–25 lb | [Nuffield Health](https://youtu.be/cBSD6mQIPQk) |
+| 6 | Squats | 3 × 12, bodyweight | [Bupa Health](https://youtu.be/m0GcZ24pK6k) |
+
 ## Desk Reset — 2 min, every hour you sit
 Stand & walk 1 min · Standing back extension ×5 ([Pursuit PT](https://youtu.be/0AejdxtYrXI)) · Standing hip flexor stretch 20s/side ([Coury & Buehler PT](https://youtu.be/ljCDEb_MIto)) · Chin tucks ×5
 

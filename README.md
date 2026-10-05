@@ -10,6 +10,7 @@ Two routines, **alternated daily** (the app counts from 2026-09-25 = A; miss a d
 |---|---|---|
 | **A · Unlock** | 10 mobility moves (hips, spine, hamstrings, chest, posture) + balance finish | ~30 min |
 | **B · Build** | 10 back-first strength moves (McGill Big 3, bridges, rows, hinge, squat, push-up) + balance finish | ~30–35 min |
+| **C · Classic** | 6 bodyweight classics: step-back burpees, pull-ups, sit-ups, push-ups, DB curls, squats — optional tab, not in the A/B rotation | ~20–25 min |
 | **Desk Reset** | 4 moves, 2 min, every hour of sitting | 2 min |
 
 **Balance finish** (end of both routines): feet-together stand, heel-to-toe stand, single-leg stand, heel-to-toe walk — always at a counter.
@@ -38,5 +39,6 @@ YouTube embeds can fail when the page is opened as a local `file://` — use the
 - `clips/` — v1 still-frame clips (unused since v2; kept)
 
 ## History
+- **2026-10-05:** added Routine C — Classic (optional tab).
 - **v2 — 2026-09-25:** replaced the 7-day strength plan with A/B Unlock & Build + Desk Reset, embedded PT demo videos, TV casting buttons, balance finish on both routines. Storage keys moved to `wk2_*` (v1 history is untouched under `wk_*`).
 - **v1 — 2026-06-26:** 7-day strength & mobility plan with still-frame clips. Local archive: `Downloads\_swplan\workout_v1_2026-06-26.html` and `workout_plan_v1_2026-06-26.md`; also in this repo's git history.

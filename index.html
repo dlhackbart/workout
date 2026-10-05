@@ -143,13 +143,20 @@ const PLAN = {
     {n:"Hip Hinge → Dumbbell RDL", d:"3 × 10  ·  dowel wks 1–2, then 10–20 lb", k:"Dowel touches head, upper back and tailbone the whole rep. Push the hips back; knees soft.", v:"4_31Jnmt7cE"},
     {n:"Box Squat to Bench", d:"3 × 10  ·  bodyweight", k:"Sit back to the bench, touch lightly, stand up through the heels. Hands forward for balance.", v:"Lj56usJbLiU"},
     {n:"Incline Push-Up", d:"3 × 8–10", k:"Hands on the counter or bench. Body in one line. Lower the incline as it gets easy.", v:"49jfZ_z7-us"}, ...BALANCE ]},
+  C: { tab:"C · Classic", focus:"Routine C — Classic", sub:"Bodyweight classics · ~20–25 min · 3 rounds, 60s rest · neck neutral on every rep", items:[
+    {n:"Burpees (step-back)", d:"3 × 5", k:"Step back and step in — no jump, no floor drop — until balance is solid. Hands on a bench makes it easier. Head stays in line; don't look up.", v:"iUL2tndomms"},
+    {n:"Pull-Ups", d:"3 × max (stop 1–2 short of failure)", k:"Full hang to chin over bar, no kipping, don't crane the chin up. Can't do one yet? Slow negatives (jump up, 3–5s down) or a band.", v:"1rRmIzEsl_4"},
+    {n:"Sit-Ups", d:"3 × 10", k:"Arms crossed on chest — never hands behind the head pulling on the neck. Chin stays neutral; roll up smoothly, lower slowly.", v:"HmzxDbnYngE"},
+    {n:"Push-Ups", d:"3 × 8–10", k:"Body in one line, elbows ~45°, gaze at the floor. Too hard? Hands on the bench (your incline push-up).", v:"9m3tq2A17BI"},
+    {n:"Dumbbell Curls", d:"3 × 10  ·  15–25 lb", k:"Elbows pinned to your sides, no swinging. Lower for a slow 2–3 count.", v:"cBSD6mQIPQk"},
+    {n:"Squats", d:"3 × 12  ·  bodyweight", k:"Feet shoulder-width, sit back and down, chest up, knees track over toes. Bench behind you until depth is steady.", v:"m0GcZ24pK6k"} ]},
   D: { tab:"Desk Reset", focus:"Desk Reset — 2 min", sub:"Every hour you sit. Not a workout — a break from the chair.", items:[
     {n:"Stand Up & Walk", d:"1 min", k:"Walk to the kitchen and back. Just get out of the chair."},
     {n:"Standing Back Extension", d:"5 reps", k:"Hands on your low back, lean back gently. The standing version of your press-up.", v:"0AejdxtYrXI"},
     {n:"Standing Hip Flexor Stretch", d:"20s / side", k:"Tuck the pelvis, squeeze the back glute.", v:"ljCDEb_MIto"},
     {n:"Chin Tucks", d:"5 reps", k:"Slide the head straight back.", v:"7rnlAVhAK-8"} ]}
 };
-const ORDER=["A","B","D"];
+const ORDER=["A","B","C","D"];
 const dkey=dt=>`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
 // Alternate A/B daily, counted from 2026-09-25 (= A). Miss a day? just do the other one next — tap its tab.
 const dayNum=d=>Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/86400000);
